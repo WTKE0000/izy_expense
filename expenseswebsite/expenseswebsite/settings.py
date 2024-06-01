@@ -9,10 +9,12 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
-from pathlib import Path
-
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+from pathlib import Path
 
 # Now you can access the environment variables like this:
 print(os.getenv('DB_HOST'))
@@ -84,7 +86,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME':os.environ.get('DB_NAME'),
-        'USER':os.environ.get('postgres'),
+        'USER':os.environ.get('DB_USER'),
         'PASSWORD':os.environ.get('DB_USER_PASSWORD'),
         'HOST':os.environ.get('DB_HOST')
     }
@@ -125,8 +127,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS=[os.path.join(BASE_DIR, 'expensewebsite/static')]
+STATIC_URL = '/static/'
+STATICFILES_DIRS=[os.path.join(BASE_DIR, 'expenseswebsite/static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
