@@ -69,30 +69,32 @@ class RegistrationView(View):
 
                 user = User.objects.create_user(username=username, email=email)
                 user.set_password(password)
-                user.is_active = False
+                user.is_active = True   # change this when you want to include the account activation via email
                 user.save()
-                current_site = get_current_site(request)
-                email_body = {
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                    'token': account_activation_token.make_token(user),
-                }
 
-                link = reverse('activate', kwargs={
-                               'uidb64': email_body['uid'], 'token': email_body['token']})
+                if not user.is_active:
+                    current_site = get_current_site(request)
+                    email_body = {
+                        'user': user,
+                        'domain': current_site.domain,
+                        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                        'token': account_activation_token.make_token(user),
+                    }
 
-                email_subject = 'Activate your account'
+                    link = reverse('activate', kwargs={
+                                'uidb64': email_body['uid'], 'token': email_body['token']})
 
-                activate_url = 'http://'+current_site.domain+link
+                    email_subject = 'Activate your account'
 
-                email = EmailMessage(
-                    email_subject,
-                    'Hi '+user.username + ', Please the link below to activate your account \n'+activate_url,
-                    'noreply@semycolon.com',
-                    [email],
-                )
-                email.send(fail_silently=False)
+                    activate_url = 'http://'+current_site.domain+link
+
+                    email = EmailMessage(
+                        email_subject,
+                        'Hi '+user.username + ', Please the link below to activate your account \n'+activate_url,
+                        'noreply@semycolon.com',
+                        [email],
+                    )
+                    email.send(fail_silently=False)
                 messages.success(request, 'Account successfully created')
                 return render(request, 'authentication/register.html')
 
@@ -110,6 +112,7 @@ class VerificationView(View):
 
             if user.is_active:
                 return redirect('login')
+            
             user.is_active = True
             user.save()
 
